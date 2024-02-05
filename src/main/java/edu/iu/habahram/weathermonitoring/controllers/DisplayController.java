@@ -1,21 +1,24 @@
 package edu.iu.habahram.weathermonitoring.controllers;
 
 import edu.iu.habahram.weathermonitoring.model.CurrentConditionDisplay;
-import edu.iu.habahram.weathermonitoring.model.ForecastDisplay;
-import edu.iu.habahram.weathermonitoring.model.Observer;
 import edu.iu.habahram.weathermonitoring.model.StatisticsDisplay;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/displays")
 public class DisplayController {
     private CurrentConditionDisplay currentConditionDisplay;
+    private StatisticsDisplay statisticsDisplay;
 
-    public DisplayController(CurrentConditionDisplay currentConditionDisplay
-                             ) {
+    public DisplayController(CurrentConditionDisplay currentConditionDisplay, StatisticsDisplay statisticsDisplay
+    ) {
         this.currentConditionDisplay = currentConditionDisplay;
+        this.statisticsDisplay = statisticsDisplay;
     }
 
     @GetMapping
@@ -25,6 +28,9 @@ public class DisplayController {
         html += "<ul>";
         html += "<li>";
         html += String.format("<a href=/displays/%s>%s</a>", currentConditionDisplay.id(), currentConditionDisplay.name());
+        html += "</li>";
+        html += "<li>";
+        html += String.format("<a href=/displays/%s>%s</a>", statisticsDisplay.id(), statisticsDisplay.name());
         html += "</li>";
 
         html += "</ul>";
@@ -42,6 +48,10 @@ public class DisplayController {
             html = currentConditionDisplay.display();
             status = HttpStatus.FOUND;
         }
+        if (id.equalsIgnoreCase(statisticsDisplay.id())) {
+            html = statisticsDisplay.display();
+            status = HttpStatus.FOUND;
+        }
         return ResponseEntity
                 .status(status)
                 .body(html);
@@ -53,6 +63,11 @@ public class DisplayController {
         HttpStatus status = null;
         if (id.equalsIgnoreCase(currentConditionDisplay.id())) {
             currentConditionDisplay.subscribe();
+            html = "Subscribed!";
+            status = HttpStatus.FOUND;
+
+        } else if (id.equalsIgnoreCase(statisticsDisplay.id())) {
+            statisticsDisplay.subscribe();
             html = "Subscribed!";
             status = HttpStatus.FOUND;
         } else {
